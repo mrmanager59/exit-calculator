@@ -6,81 +6,39 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-50 p-10">
-  <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
-    <h1 class="text-xl font-bold mb-4">Exit-förhandlingskalkylator – MVP</h1>
-    <p class="mb-6">Ett verktyg för att räkna ut ditt förhandlingsmål vid uppsägning, baserat på LAS, kollektivavtal och branschpraxis.</p>
-    <canvas id="resultChart" class="mb-10"></canvas>
-    <canvas id="goalChart"></canvas>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-6">
+  <div class="bg-white shadow-lg rounded-2xl p-8 max-w-xl w-full">
+    <h1 class="text-2xl font-bold mb-6 text-center">Exit-förhandlingskalkylator</h1>
+    <p class="mb-4 text-gray-600 text-sm text-center">Fyll i dina uppgifter nedan för att få en personlig förhandlingsbedömning.</p>
+    <form onsubmit="handleSubmit(event)" class="space-y-4">
+      <label class="block">Månadslön:
+        <input type="number" name="lon" required class="w-full border rounded px-3 py-2" />
+      </label>
+      <label class="block">Uppsägningstid (mån):
+        <input type="number" name="uppsagningstid" required class="w-full border rounded px-3 py-2" />
+      </label>
+      <label class="block">Sparade semesterdagar:
+        <input type="number" name="semesterdagar" class="w-full border rounded px-3 py-2" />
+      </label>
+      <div class="flex items-center"><input type="checkbox" name="arbetsbefriad" class="mr-2" />Arbetsbefriad?</div>
+      <label class="block">Mån. utan lön före nytt jobb:
+        <input type="number" name="manaderUtanLon" value="0" class="w-full border rounded px-3 py-2" />
+      </label>
+      <label class="block">Roll:
+        <select name="roll" class="w-full border rounded px-3 py-2">
+          <option value="Chef">Chef</option>
+          <option value="Senior specialist">Senior specialist</option>
+          <option value="Tjansteman">Tjänsteman</option>
+          <option value="Annat">Annat</option>
+        </select>
+      </label>
+      <div class="flex items-center"><input type="checkbox" name="kollektivavtal" class="mr-2" />Kollektivavtal?</div>
+      <div class="flex items-center"><input type="checkbox" name="harAvgangsvederlag" class="mr-2" />Rätt till avgångsvederlag?</div>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full font-semibold">Beräkna</button>
+    </form>
+    <pre id="resultat" class="mt-6 bg-gray-100 p-4 rounded text-sm whitespace-pre-wrap"></pre>
+    <canvas id="resultChart" class="mt-6"></canvas>
+    <canvas id="goalChart" class="mt-6"></canvas>
   </div>
-  <script>
-    const resultat = {
-      basersattning: 570000,
-      arbetsbefrielsevarde: 380000,
-      semesterersattning: 114000,
-      avgangsvederlag: 570000,
-      lagtMal: 1630000,
-      rimligtMal: 2119000,
-      ambitiostMal: 2608000
-    };
-
-    const ctx1 = document.getElementById('resultChart').getContext('2d');
-    new Chart(ctx1, {
-      type: 'bar',
-      data: {
-        labels: ['Basersättning', 'Arbetsbefrielsevärde', 'Semesterersättning', 'Avgångsvederlag'],
-        datasets: [{
-          label: 'Belopp (kr)',
-          data: [
-            resultat.basersattning,
-            resultat.arbetsbefrielsevarde,
-            resultat.semesterersattning,
-            resultat.avgangsvederlag
-          ],
-          backgroundColor: [
-            'rgba(59, 130, 246, 0.7)',
-            'rgba(34, 197, 94, 0.7)',
-            'rgba(234, 179, 8, 0.7)',
-            'rgba(239, 68, 68, 0.7)'
-          ]
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          title: { display: true, text: 'Fördelning av kompensation' }
-        }
-      }
-    });
-
-    const ctx2 = document.getElementById('goalChart').getContext('2d');
-    new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: ['Lågt mål', 'Rimligt mål', 'Ambitiöst mål'],
-        datasets: [{
-          label: 'Förhandlingsmål (kr)',
-          data: [
-            resultat.lagtMal,
-            resultat.rimligtMal,
-            resultat.ambitiostMal
-          ],
-          backgroundColor: [
-            'rgba(147, 197, 253, 0.7)',
-            'rgba(96, 165, 250, 0.7)',
-            'rgba(37, 99, 235, 0.7)'
-          ]
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          title: { display: true, text: 'Rekommenderade målnivåer' }
-        }
-      }
-    });
-  </script>
 </body>
 </html>
