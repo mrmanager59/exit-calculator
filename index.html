@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -9,7 +10,6 @@
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-6">
   <div class="bg-white shadow-lg rounded-2xl p-8 max-w-xl w-full">
     <h1 class="text-2xl font-bold mb-6 text-center">Exit-förhandlingskalkylator</h1>
-    <p class="mb-4 text-gray-600 text-sm text-center">Fyll i dina uppgifter nedan för att få en personlig förhandlingsbedömning.</p>
     <form onsubmit="handleSubmit(event)" class="space-y-4">
       <label class="block">Månadslön:
         <input type="number" name="lon" required class="w-full border rounded px-3 py-2" />
@@ -36,9 +36,115 @@
       <div class="flex items-center"><input type="checkbox" name="harAvgangsvederlag" class="mr-2" />Rätt till avgångsvederlag?</div>
       <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full font-semibold">Beräkna</button>
     </form>
-    <pre id="resultat" class="mt-6 bg-gray-100 p-4 rounded text-sm whitespace-pre-wrap"></pre>
-    <canvas id="resultChart" class="mt-6"></canvas>
-    <canvas id="goalChart" class="mt-6"></canvas>
+
+    <div id="resultat-wrapper" class="hidden">
+      <pre id="resultat" class="mt-6 bg-gray-100 p-4 rounded text-sm whitespace-pre-wrap scroll-mt-10"></pre>
+      <canvas id="resultChart" class="mt-6 scroll-mt-10"></canvas>
+      <canvas id="goalChart" class="mt-6"></canvas>
+
+      <div class="mt-10 border-t pt-6">
+        <h2 class="text-lg font-bold mb-2">Få en detaljerad rapport med förhandlingstips</h2>
+        <p class="mb-4">För endast <strong>99 kr</strong> får du en professionell PDF skickad till din e-post med:</p>
+        <ul class="list-disc list-inside text-sm mb-4">
+          <li>Ditt exakta förhandlingsintervall</li>
+          <li>Argument att använda vid avslut</li>
+          <li>Exempel på hur du formulerar dig</li>
+        </ul>
+        <button onclick="mockCheckout()" class="bg-green-600 text-white px-4 py-2 rounded w-full font-semibold">
+          Gå vidare till betalning
+        </button>
+      </div>
+    </div>
   </div>
+
+  <script>
+    function beraknaForhandlingsmal(data) {
+      const { lon, uppsagningstid, arbetsbefriad, manaderUtanLon, semesterdagar, roll, kollektivavtal, harAvgangsvederlag } = data;
+      const basersattning = lon * uppsagningstid;
+      const arbetsbefrielsevarde = arbetsbefriad ? (uppsagningstid - manaderUtanLon) * lon : 0;
+      const semesterersattning = (semesterdagar / 25) * lon;
+      let extraManader = 0;
+      if (kollektivavtal && harAvgangsvederlag) {
+        if (roll === "Chef") extraManader = 6;
+        else if (roll === "Senior specialist") extraManader = 3;
+        else extraManader = 1;
+      }
+      const avgangsvederlag = extraManader * lon;
+      const total = basersattning + arbetsbefrielsevarde + semesterersattning + avgangsvederlag;
+      return {
+        basersattning,
+        arbetsbefrielsevarde,
+        semesterersattning,
+        avgangsvederlag,
+        totalKompensation: total,
+        lagtMal: total,
+        rimligtMal: total * 1.3,
+        ambitiostMal: total * 1.6
+      };
+    }
+
+    function handleSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+      const data = {
+        lon: parseFloat(form.lon.value),
+        uppsagningstid: parseInt(form.uppsagningstid.value),
+        arbetsbefriad: form.arbetsbefriad.checked,
+        manaderUtanLon: parseInt(form.manaderUtanLon.value) || 0,
+        semesterdagar: parseInt(form.semesterdagar.value) || 0,
+        roll: form.roll.value,
+        kollektivavtal: form.kollektivavtal.checked,
+        harAvgangsvederlag: form.harAvgangsvederlag.checked
+      };
+      const resultat = beraknaForhandlingsmal(data);
+      document.getElementById("resultat-wrapper").classList.remove("hidden");
+      document.getElementById("resultat").innerText =
+        `Total kompensation: ${resultat.totalKompensation.toLocaleString()} kr\n` +
+        `Lågt mål: ${resultat.lagtMal.toLocaleString()} kr\n` +
+        `Rimligt mål: ${resultat.rimligtMal.toLocaleString()} kr\n` +
+        `Ambitiöst mål: ${resultat.ambitiostMal.toLocaleString()} kr`;
+
+      const ctx1 = document.getElementById("resultChart").getContext("2d");
+      if (window.chartInstance1) window.chartInstance1.destroy();
+      window.chartInstance1 = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: ['Basersättning', 'Arbetsbefrielsevärde', 'Semesterersättning', 'Avgångsvederlag'],
+          datasets: [{
+            label: 'Belopp (kr)',
+            data: [
+              resultat.basersattning,
+              resultat.arbetsbefrielsevarde,
+              resultat.semesterersattning,
+              resultat.avgangsvederlag
+            ],
+            backgroundColor: ['#3b82f6','#22c55e','#eab308','#ef4444']
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false }, title: { display: true, text: 'Fördelning av kompensation' } } }
+      });
+
+      const ctx2 = document.getElementById("goalChart").getContext("2d");
+      if (window.chartInstance2) window.chartInstance2.destroy();
+      window.chartInstance2 = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: ['Lågt mål', 'Rimligt mål', 'Ambitiöst mål'],
+          datasets: [{
+            label: 'Förhandlingsmål (kr)',
+            data: [resultat.lagtMal, resultat.rimligtMal, resultat.ambitiostMal],
+            backgroundColor: ['#93c5fd','#60a5fa','#2563eb']
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false }, title: { display: true, text: 'Rekommenderade målnivåer' } } }
+      });
+
+      document.getElementById("resultChart").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function mockCheckout() {
+      alert('Testläge: Här skulle kunden gå till betalning (Stripe Checkout)');
+    }
+  </script>
 </body>
 </html>
