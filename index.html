@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exit Kalkylator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 p-10">
+  <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-xl font-bold mb-4">Exit-förhandlingskalkylator – MVP</h1>
+    <p class="mb-6">Ett verktyg för att räkna ut ditt förhandlingsmål vid uppsägning, baserat på LAS, kollektivavtal och branschpraxis.</p>
+    <canvas id="resultChart" class="mb-10"></canvas>
+    <canvas id="goalChart"></canvas>
+  </div>
+  <script>
+    const resultat = {
+      basersattning: 570000,
+      arbetsbefrielsevarde: 380000,
+      semesterersattning: 114000,
+      avgangsvederlag: 570000,
+      lagtMal: 1630000,
+      rimligtMal: 2119000,
+      ambitiostMal: 2608000
+    };
+
+    const ctx1 = document.getElementById('resultChart').getContext('2d');
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: ['Basersättning', 'Arbetsbefrielsevärde', 'Semesterersättning', 'Avgångsvederlag'],
+        datasets: [{
+          label: 'Belopp (kr)',
+          data: [
+            resultat.basersattning,
+            resultat.arbetsbefrielsevarde,
+            resultat.semesterersattning,
+            resultat.avgangsvederlag
+          ],
+          backgroundColor: [
+            'rgba(59, 130, 246, 0.7)',
+            'rgba(34, 197, 94, 0.7)',
+            'rgba(234, 179, 8, 0.7)',
+            'rgba(239, 68, 68, 0.7)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'Fördelning av kompensation' }
+        }
+      }
+    });
+
+    const ctx2 = document.getElementById('goalChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ['Lågt mål', 'Rimligt mål', 'Ambitiöst mål'],
+        datasets: [{
+          label: 'Förhandlingsmål (kr)',
+          data: [
+            resultat.lagtMal,
+            resultat.rimligtMal,
+            resultat.ambitiostMal
+          ],
+          backgroundColor: [
+            'rgba(147, 197, 253, 0.7)',
+            'rgba(96, 165, 250, 0.7)',
+            'rgba(37, 99, 235, 0.7)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'Rekommenderade målnivåer' }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
