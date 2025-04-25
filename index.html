@@ -10,146 +10,116 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-  <!-- Header -->
-  <header class="bg-white shadow p-4 flex items-center justify-center">
-    <img src="LOGOTYP-URL-HÄR" alt="Uppsägningskollen" class="h-10">
-  </header>
+<header class="bg-white shadow p-4 flex items-center justify-center">
+  <img src="LOGOTYP-URL-HÄR" alt="Uppsägningskollen" class="h-10">
+</header>
 
-  <!-- Landing Page Section -->
-  <section class="text-center py-12 px-6 bg-white">
-    <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">Har du blivit uppsagd eller erbjuden en överenskommelse?</h1>
-    <p class="text-gray-600 max-w-2xl mx-auto text-lg">Du kan ha rätt till hundratusentals kronor – vi hjälper dig räkna ut ditt förhandlingsutrymme på 1 minut.</p>
-    <div class="mt-8">
-      <button onclick="scrollToCalculator()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded text-lg">Starta gratis kalkyl nu</button>
-    </div>
-    <div class="mt-10 text-left max-w-2xl mx-auto space-y-6 text-gray-700">
-      <div>
-        <h2 class="text-xl font-bold mb-2">Så fungerar det:</h2>
-        <ul class="list-disc list-inside space-y-1">
-          <li>Fyll i några enkla uppgifter</li>
-          <li>Se direkt hur mycket du kan förhandla om</li>
-          <li>Få möjlighet att köpa en komplett rapport med mål och förhandlingstips</li>
-        </ul>
+<section class="text-center py-12 px-6 bg-white">
+  <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">Har du blivit uppsagd eller erbjuden en överenskommelse?</h1>
+  <p class="text-gray-600 max-w-2xl mx-auto text-lg">Du kan ha rätt till hundratusentals kronor – vi hjälper dig räkna ut ditt förhandlingsutrymme på 1 minut.</p>
+  <div class="mt-8">
+    <button onclick="scrollToCalculator()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded text-lg">Starta gratis kalkyl nu</button>
+  </div>
+</section>
+
+<section id="calculator" class="bg-gray-100 py-12 px-6">
+  <div class="bg-white shadow-lg rounded-2xl p-6 sm:p-8 w-full max-w-lg mx-auto">
+    <h2 class="text-2xl font-bold mb-6 text-center">Hur mycket kan du förhandla om?</h2>
+
+    <form id="form" onsubmit="handleSubmit(event)" class="space-y-4">
+      <div><label class="block font-medium mb-1">Månadslön (kr):</label><input type="number" name="lon" required class="w-full border rounded px-3 py-2" /></div>
+      <div><label class="block font-medium mb-1">Uppsägningstid (månader):</label><input type="number" name="uppsagningstid" required class="w-full border rounded px-3 py-2" /></div>
+      <div><label class="block font-medium mb-1">Arbetsbefriad (månader):</label><input type="number" name="arbetsbefriad" value="0" class="w-full border rounded px-3 py-2" /></div>
+      <div><label class="block font-medium mb-1">Sparade semesterdagar:</label><input type="number" name="semesterdagar" value="0" class="w-full border rounded px-3 py-2" /></div>
+      <div class="flex items-start gap-2"><input type="checkbox" name="villAvgangsvederlag" class="mt-1" /><label><strong>Jag vill förhandla om avgångsvederlag</strong><br><span class="text-gray-500 text-sm">Vanligt för chefer, seniora tjänstemän eller om du omfattas av kollektivavtal.</span></label></div>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-3 rounded w-full font-semibold text-lg">Visa resultat</button>
+    </form>
+
+    <div id="resultWrapper" class="mt-10 hidden">
+      <h3 class="text-xl font-semibold mb-4 text-center">Preliminär uppskattning:</h3>
+      <p class="text-gray-700 mb-6 text-center">Du kan ha rätt att förhandla om <span id="totalBelopp" class="font-bold text-blue-700 text-xl"></span> kr.</p>
+      <div class="mb-6"><canvas id="chart"></canvas></div>
+
+      <div class="mb-6 mt-8">
+        <h4 class="text-lg font-semibold text-center mb-4">Typiskt förhandlingsintervall</h4>
+        <canvas id="goalChart"></canvas>
       </div>
-      <div>
-        <h2 class="text-xl font-bold mb-2">Varför välja Uppsägningskollen?</h2>
-        <ul class="list-disc list-inside space-y-1">
-          <li>Baserad på svensk lag, kollektivavtal och etablerad praxis</li>
-          <li>Anonymt och säkert – inga personuppgifter behövs</li>
-          <li>Professionell rådgivning utan dyra konsultkostnader</li>
-        </ul>
-      </div>
-    </div>
-  </section>
 
-  <!-- Calculator Section -->
-  <section id="calculator" class="bg-gray-100 py-12 px-6">
-    <div class="bg-white shadow-lg rounded-2xl p-6 sm:p-8 w-full max-w-lg mx-auto">
-      <h2 class="text-2xl font-bold mb-6 text-center">Hur mycket kan du förhandla om?</h2>
-
-      <form id="form" onsubmit="handleSubmit(event)" class="space-y-4">
-        <div>
-          <label class="block font-medium mb-1">Månadslön (kr):</label>
-          <input type="number" name="lon" min="1" required class="w-full border rounded px-3 py-2" />
-        </div>
-        <div>
-          <label class="block font-medium mb-1">Uppsägningstid (månader):</label>
-          <input type="number" name="uppsagningstid" min="1" required class="w-full border rounded px-3 py-2" />
-        </div>
-        <div>
-          <label class="block font-medium mb-1">Arbetsbefriad (månader):</label>
-          <input type="number" name="arbetsbefriad" min="0" value="0" class="w-full border rounded px-3 py-2" />
-        </div>
-        <div>
-          <label class="block font-medium mb-1">Sparade semesterdagar:</label>
-          <input type="number" name="semesterdagar" min="0" value="0" class="w-full border rounded px-3 py-2" />
-        </div>
-        <div class="flex items-start gap-2">
-          <input type="checkbox" name="villAvgangsvederlag" class="mt-1" />
-          <label class="text-sm sm:text-base"><strong>Jag vill förhandla om avgångsvederlag</strong><br>
-            <span class="text-gray-500">Vanligt för chefer, seniora tjänstemän eller om du omfattas av kollektivavtal.</span>
-          </label>
-        </div>
-        <button type="submit" class="bg-blue-600 text-white px-4 py-3 rounded w-full font-semibold text-lg">Visa resultat</button>
-      </form>
-
-      <div id="resultWrapper" class="mt-10 hidden">
-        <h3 class="text-xl font-semibold mb-4 text-center">Preliminär uppskattning:</h3>
-        <p class="text-gray-700 mb-6 text-center">Du kan ha rätt att förhandla om <span id="totalBelopp" class="font-bold text-blue-700 text-xl"></span> kr.</p>
-        <div class="mb-6">
-          <canvas id="chart"></canvas>
-        </div>
-
-        <div class="p-4 border-l-4 border-green-500 bg-green-50 rounded">
-          <p class="mb-2 font-semibold">Vill du få en färdig rapport med exakta mål och tips?</p>
-          <p class="mb-4 text-sm">Få en PDF anpassad för din förhandling, skickad till din e-post.</p>
-          <button onclick="mockPay()" class="bg-green-600 text-white px-4 py-3 rounded w-full font-semibold text-lg">Få rapporten – 99 kr</button>
-        </div>
+      <div class="p-4 border-l-4 border-green-500 bg-green-50 rounded mt-8">
+        <p class="mb-2 font-semibold">Vill du få en färdig rapport med exakta mål och tips?</p>
+        <p class="mb-4 text-sm">Få en PDF anpassad för din förhandling, skickad till din e-post.</p>
+        <button onclick="mockPay()" class="bg-green-600 text-white px-4 py-3 rounded w-full font-semibold text-lg">Få rapporten – 99 kr</button>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Footer -->
-  <footer class="bg-white text-center py-6 text-sm text-gray-400">
-    &copy; 2025 Uppsägningskollen. Alla rättigheter reserverade.
-  </footer>
+<footer class="bg-white text-center py-6 text-sm text-gray-400">
+  &copy; 2025 Uppsägningskollen. Alla rättigheter reserverade.
+</footer>
 
-  <script>
-    function scrollToCalculator() {
-      document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' });
+<script>
+function scrollToCalculator() {
+  document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' });
+}
+
+function handleSubmit(event) {
+  event.preventDefault();
+  const form = event.target;
+  const lon = parseFloat(form.lon.value);
+  const uppsagningstid = parseFloat(form.uppsagningstid.value);
+  const arbetsbefriad = parseFloat(form.arbetsbefriad.value) || 0;
+  const semesterdagar = parseFloat(form.semesterdagar.value) || 0;
+  const villAvgangsvederlag = form.villAvgangsvederlag.checked;
+
+  const semestermånader = semesterdagar / 25;
+  const avgangsMånader = villAvgangsvederlag ? 3 : 0;
+  const totalManader = uppsagningstid + arbetsbefriad + semestermånader + avgangsMånader;
+  const totalBelopp = totalManader * lon;
+
+  document.getElementById("resultWrapper").classList.remove("hidden");
+  document.getElementById("totalBelopp").textContent = totalBelopp.toLocaleString("sv-SE");
+
+  const ctx = document.getElementById("chart").getContext("2d");
+  if (window.resultChart) window.resultChart.destroy();
+  window.resultChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Uppsägningstid', 'Arbetsbefriad', 'Semester', 'Avgångsvederlag'],
+      datasets: [{
+        label: 'Belopp (kr)',
+        data: [uppsagningstid * lon, arbetsbefriad * lon, semestermånader * lon, avgangsMånader * lon],
+        backgroundColor: ['#3b82f6','#22c55e','#eab308','#ef4444']
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false }, title: { display: true, text: 'Uppskattad kompensation – fördelning' } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  const ctxGoal = document.getElementById("goalChart").getContext("2d");
+  if (window.goalChart) window.goalChart.destroy();
+  window.goalChart = new Chart(ctxGoal, {
+    type: 'bar',
+    data: {
+      labels: ['Lågt mål', 'Rimligt mål', 'Ambitiöst mål'],
+      datasets: [{
+        label: 'Förhandlingsmål (proportion)',
+        data: [0.6, 1, 1.3],
+        backgroundColor: ['#60a5fa','#3b82f6','#2563eb']
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { display: false }, title: { display: true, text: 'Exempel på förhandlingsmål' } },
+      scales: { x: { display: false }, y: { ticks: { color: '#374151' } } }
     }
+  });
+}
 
-    function handleSubmit(event) {
-      event.preventDefault();
-      const form = event.target;
-      const lon = parseFloat(form.lon.value);
-      const uppsagningstid = parseFloat(form.uppsagningstid.value);
-      const arbetsbefriad = parseFloat(form.arbetsbefriad.value) || 0;
-      const semesterdagar = parseFloat(form.semesterdagar.value) || 0;
-      const villAvgangsvederlag = form.villAvgangsvederlag.checked;
+function mockPay() {
+  alert("Testläge: Här skulle användaren gå till betalning och få sin PDF.");
+}
+</script>
 
-      const semestermånader = semesterdagar / 25;
-      const avgangsMånader = villAvgangsvederlag ? 3 : 0;
-
-      const totalManader = uppsagningstid + arbetsbefriad + semestermånader + avgangsMånader;
-      const totalBelopp = totalManader * lon;
-
-      document.getElementById("resultWrapper").classList.remove("hidden");
-      document.getElementById("totalBelopp").textContent = totalBelopp.toLocaleString("sv-SE");
-
-      const ctx = document.getElementById("chart").getContext("2d");
-      if (window.resultChart) window.resultChart.destroy();
-      window.resultChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Uppsägningstid', 'Arbetsbefriad', 'Semester', 'Avgångsvederlag'],
-          datasets: [{
-            label: 'Belopp (kr)',
-            data: [
-              uppsagningstid * lon,
-              arbetsbefriad * lon,
-              semestermånader * lon,
-              avgangsMånader * lon
-            ],
-            backgroundColor: ['#3b82f6','#22c55e','#eab308','#ef4444']
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            title: { display: true, text: 'Uppskattad kompensation – fördelning' }
-          },
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-    }
-
-    function mockPay() {
-      alert("Testläge: Här skulle användaren gå till betalning och få sin PDF.");
-    }
-  </script>
 </body>
 </html>
