@@ -3,147 +3,105 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <title>Exit Kalkylator</title>
+  <title>Uppsägningskollen – Snabbkalkyl</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-6">
-  <div class="bg-white shadow-lg rounded-2xl p-8 max-w-xl w-full">
-    <h1 class="text-2xl font-bold mb-6 text-center">Exit-förhandlingskalkylator</h1>
-    <form onsubmit="handleSubmit(event)" class="space-y-4">
-      <label class="block">Månadslön:
-        <input type="number" name="lon" required class="w-full border rounded px-3 py-2" />
-      </label>
-      <label class="block">Uppsägningstid (mån):
-        <input type="number" name="uppsagningstid" required class="w-full border rounded px-3 py-2" />
-      </label>
-      <label class="block">Sparade semesterdagar:
-        <input type="number" name="semesterdagar" class="w-full border rounded px-3 py-2" />
-      </label>
-      <div class="flex items-center"><input type="checkbox" name="arbetsbefriad" class="mr-2" />Arbetsbefriad?</div>
-      <label class="block">Mån. utan lön före nytt jobb:
-        <input type="number" name="manaderUtanLon" value="0" class="w-full border rounded px-3 py-2" />
-      </label>
-      <label class="block">Roll:
-        <select name="roll" class="w-full border rounded px-3 py-2">
-          <option value="Chef">Chef</option>
-          <option value="Senior specialist">Senior specialist</option>
-          <option value="Tjansteman">Tjänsteman</option>
-          <option value="Annat">Annat</option>
-        </select>
-      </label>
-      <div class="flex items-center"><input type="checkbox" name="kollektivavtal" class="mr-2" />Kollektivavtal?</div>
-      <div class="flex items-center"><input type="checkbox" name="harAvgangsvederlag" class="mr-2" />Rätt till avgångsvederlag?</div>
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full font-semibold">Beräkna</button>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-xl mx-auto bg-white p-8 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4 text-center">Hur mycket har du rätt att förhandla om?</h1>
+    <p class="mb-6 text-gray-700 text-center">Fyll i din situation – vi visar direkt hur mycket pengar som kan ligga på bordet.</p>
+
+    <form id="form" onsubmit="handleSubmit(event)" class="space-y-4">
+      <div>
+        <label class="block font-medium">Månadslön (kr):</label>
+        <input type="number" name="lon" min="1" required class="w-full border rounded px-3 py-2" />
+      </div>
+      <div>
+        <label class="block font-medium">Uppsägningstid (månader):</label>
+        <input type="number" name="uppsagningstid" min="1" required class="w-full border rounded px-3 py-2" />
+      </div>
+      <div>
+        <label class="block font-medium">Arbetsbefriad (månader):</label>
+        <input type="number" name="arbetsbefriad" min="0" value="0" class="w-full border rounded px-3 py-2" />
+      </div>
+      <div>
+        <label class="block font-medium">Sparade semesterdagar:</label>
+        <input type="number" name="semesterdagar" min="0" value="0" class="w-full border rounded px-3 py-2" />
+      </div>
+      <div class="flex items-start gap-2">
+        <input type="checkbox" name="villAvgangsvederlag" class="mt-1" />
+        <label><strong>Jag vill förhandla om avgångsvederlag</strong><br>
+          <span class="text-sm text-gray-500">Vanligt för chefer, seniora tjänstemän eller om du omfattas av kollektivavtal.</span>
+        </label>
+      </div>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full font-semibold">Visa resultat</button>
     </form>
 
-    <div id="resultat-wrapper" class="hidden">
-      <pre id="resultat" class="mt-6 bg-gray-100 p-4 rounded text-sm whitespace-pre-wrap scroll-mt-10"></pre>
-      <canvas id="resultChart" class="mt-6 scroll-mt-10"></canvas>
-      <canvas id="goalChart" class="mt-6"></canvas>
+    <div id="resultWrapper" class="mt-8 hidden">
+      <h2 class="text-xl font-semibold mb-4">Preliminär uppskattning:</h2>
+      <p class="text-gray-800 mb-4">Du kan ha rätt att förhandla om <span id="totalBelopp" class="font-bold text-blue-700 text-lg"></span> kr.</p>
+      <canvas id="chart"></canvas>
 
-      <div class="mt-10 border-t pt-6">
-        <h2 class="text-lg font-bold mb-2">Få en detaljerad rapport med förhandlingstips</h2>
-        <p class="mb-4">För endast <strong>99 kr</strong> får du en professionell PDF skickad till din e-post med:</p>
-        <ul class="list-disc list-inside text-sm mb-4">
-          <li>Ditt exakta förhandlingsintervall</li>
-          <li>Argument att använda vid avslut</li>
-          <li>Exempel på hur du formulerar dig</li>
-        </ul>
-        <button onclick="mockCheckout()" class="bg-green-600 text-white px-4 py-2 rounded w-full font-semibold">
-          Gå vidare till betalning
-        </button>
+      <div class="mt-8 p-4 border-l-4 border-green-500 bg-green-50">
+        <p class="mb-2 font-medium">Vill du få en färdig rapport med exakta mål, formuleringar och strategi?</p>
+        <p class="mb-4">Få en PDF med det du behöver för att lyckas i din förhandling – skickas direkt till din e-post.</p>
+        <button onclick="mockPay()" class="bg-green-600 text-white px-4 py-2 rounded w-full font-semibold">Få rapporten – 99 kr</button>
       </div>
     </div>
   </div>
 
   <script>
-    function beraknaForhandlingsmal(data) {
-      const { lon, uppsagningstid, arbetsbefriad, manaderUtanLon, semesterdagar, roll, kollektivavtal, harAvgangsvederlag } = data;
-      const basersattning = lon * uppsagningstid;
-      const arbetsbefrielsevarde = arbetsbefriad ? (uppsagningstid - manaderUtanLon) * lon : 0;
-      const semesterersattning = (semesterdagar / 25) * lon;
-      let extraManader = 0;
-      if (kollektivavtal && harAvgangsvederlag) {
-        if (roll === "Chef") extraManader = 6;
-        else if (roll === "Senior specialist") extraManader = 3;
-        else extraManader = 1;
-      }
-      const avgangsvederlag = extraManader * lon;
-      const total = basersattning + arbetsbefrielsevarde + semesterersattning + avgangsvederlag;
-      return {
-        basersattning,
-        arbetsbefrielsevarde,
-        semesterersattning,
-        avgangsvederlag,
-        totalKompensation: total,
-        lagtMal: total,
-        rimligtMal: total * 1.3,
-        ambitiostMal: total * 1.6
-      };
-    }
-
     function handleSubmit(event) {
       event.preventDefault();
       const form = event.target;
-      const data = {
-        lon: parseFloat(form.lon.value),
-        uppsagningstid: parseInt(form.uppsagningstid.value),
-        arbetsbefriad: form.arbetsbefriad.checked,
-        manaderUtanLon: parseInt(form.manaderUtanLon.value) || 0,
-        semesterdagar: parseInt(form.semesterdagar.value) || 0,
-        roll: form.roll.value,
-        kollektivavtal: form.kollektivavtal.checked,
-        harAvgangsvederlag: form.harAvgangsvederlag.checked
-      };
-      const resultat = beraknaForhandlingsmal(data);
-      document.getElementById("resultat-wrapper").classList.remove("hidden");
-      document.getElementById("resultat").innerText =
-        `Total kompensation: ${resultat.totalKompensation.toLocaleString()} kr\n` +
-        `Lågt mål: ${resultat.lagtMal.toLocaleString()} kr\n` +
-        `Rimligt mål: ${resultat.rimligtMal.toLocaleString()} kr\n` +
-        `Ambitiöst mål: ${resultat.ambitiostMal.toLocaleString()} kr`;
+      const lon = parseFloat(form.lon.value);
+      const uppsagningstid = parseFloat(form.uppsagningstid.value);
+      const arbetsbefriad = parseFloat(form.arbetsbefriad.value) || 0;
+      const semesterdagar = parseFloat(form.semesterdagar.value) || 0;
+      const villAvgangsvederlag = form.villAvgangsvederlag.checked;
 
-      const ctx1 = document.getElementById("resultChart").getContext("2d");
-      if (window.chartInstance1) window.chartInstance1.destroy();
-      window.chartInstance1 = new Chart(ctx1, {
+      const semestermånader = semesterdagar / 25;
+      const avgangsMånader = villAvgangsvederlag ? 3 : 0;
+
+      const totalManader = uppsagningstid + arbetsbefriad + semestermånader + avgangsMånader;
+      const totalBelopp = totalManader * lon;
+
+      document.getElementById("resultWrapper").classList.remove("hidden");
+      document.getElementById("totalBelopp").textContent = totalBelopp.toLocaleString("sv-SE");
+
+      const ctx = document.getElementById("chart").getContext("2d");
+      if (window.resultChart) window.resultChart.destroy();
+      window.resultChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Basersättning', 'Arbetsbefrielsevärde', 'Semesterersättning', 'Avgångsvederlag'],
+          labels: ['Uppsägningstid', 'Arbetsbefriad', 'Semester', 'Avgångsvederlag'],
           datasets: [{
             label: 'Belopp (kr)',
             data: [
-              resultat.basersattning,
-              resultat.arbetsbefrielsevarde,
-              resultat.semesterersattning,
-              resultat.avgangsvederlag
+              uppsagningstid * lon,
+              arbetsbefriad * lon,
+              semestermånader * lon,
+              avgangsMånader * lon
             ],
             backgroundColor: ['#3b82f6','#22c55e','#eab308','#ef4444']
           }]
         },
-        options: { responsive: true, plugins: { legend: { display: false }, title: { display: true, text: 'Fördelning av kompensation' } } }
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Uppskattad kompensation – fördelning' }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
       });
-
-      const ctx2 = document.getElementById("goalChart").getContext("2d");
-      if (window.chartInstance2) window.chartInstance2.destroy();
-      window.chartInstance2 = new Chart(ctx2, {
-        type: 'bar',
-        data: {
-          labels: ['Lågt mål', 'Rimligt mål', 'Ambitiöst mål'],
-          datasets: [{
-            label: 'Förhandlingsmål (kr)',
-            data: [resultat.lagtMal, resultat.rimligtMal, resultat.ambitiostMal],
-            backgroundColor: ['#93c5fd','#60a5fa','#2563eb']
-          }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false }, title: { display: true, text: 'Rekommenderade målnivåer' } } }
-      });
-
-      document.getElementById("resultChart").scrollIntoView({ behavior: "smooth" });
     }
 
-    function mockCheckout() {
-      alert('Testläge: Här skulle kunden gå till betalning (Stripe Checkout)');
+    function mockPay() {
+      alert("Testläge: Här skulle användaren gå till betalning och få sin PDF.");
     }
   </script>
 </body>
