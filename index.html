@@ -4,49 +4,52 @@
 <head>
   <meta charset="UTF-8" />
   <title>Uppsägningskollen – Snabbkalkyl</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 p-6">
-  <div class="max-w-xl mx-auto bg-white p-8 rounded shadow">
-    <h1 class="text-2xl font-bold mb-4 text-center">Hur mycket har du rätt att förhandla om?</h1>
-    <p class="mb-6 text-gray-700 text-center">Fyll i din situation – vi visar direkt hur mycket pengar som kan ligga på bordet.</p>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-6">
+  <div class="bg-white shadow-lg rounded-2xl p-6 sm:p-8 w-full max-w-lg">
+    <h1 class="text-2xl font-bold mb-4 text-center">Hur mycket kan du förhandla om?</h1>
+    <p class="mb-6 text-gray-600 text-center text-sm sm:text-base">Fyll i din situation – vi visar direkt hur mycket pengar som kan ligga på bordet.</p>
 
     <form id="form" onsubmit="handleSubmit(event)" class="space-y-4">
       <div>
-        <label class="block font-medium">Månadslön (kr):</label>
+        <label class="block font-medium mb-1">Månadslön (kr):</label>
         <input type="number" name="lon" min="1" required class="w-full border rounded px-3 py-2" />
       </div>
       <div>
-        <label class="block font-medium">Uppsägningstid (månader):</label>
+        <label class="block font-medium mb-1">Uppsägningstid (månader):</label>
         <input type="number" name="uppsagningstid" min="1" required class="w-full border rounded px-3 py-2" />
       </div>
       <div>
-        <label class="block font-medium">Arbetsbefriad (månader):</label>
+        <label class="block font-medium mb-1">Arbetsbefriad (månader):</label>
         <input type="number" name="arbetsbefriad" min="0" value="0" class="w-full border rounded px-3 py-2" />
       </div>
       <div>
-        <label class="block font-medium">Sparade semesterdagar:</label>
+        <label class="block font-medium mb-1">Sparade semesterdagar:</label>
         <input type="number" name="semesterdagar" min="0" value="0" class="w-full border rounded px-3 py-2" />
       </div>
       <div class="flex items-start gap-2">
         <input type="checkbox" name="villAvgangsvederlag" class="mt-1" />
-        <label><strong>Jag vill förhandla om avgångsvederlag</strong><br>
-          <span class="text-sm text-gray-500">Vanligt för chefer, seniora tjänstemän eller om du omfattas av kollektivavtal.</span>
+        <label class="text-sm sm:text-base"><strong>Jag vill förhandla om avgångsvederlag</strong><br>
+          <span class="text-gray-500">Vanligt för chefer, seniora tjänstemän eller om du omfattas av kollektivavtal.</span>
         </label>
       </div>
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full font-semibold">Visa resultat</button>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-3 rounded w-full font-semibold text-lg">Visa resultat</button>
     </form>
 
-    <div id="resultWrapper" class="mt-8 hidden">
-      <h2 class="text-xl font-semibold mb-4">Preliminär uppskattning:</h2>
-      <p class="text-gray-800 mb-4">Du kan ha rätt att förhandla om <span id="totalBelopp" class="font-bold text-blue-700 text-lg"></span> kr.</p>
-      <canvas id="chart"></canvas>
+    <div id="resultWrapper" class="mt-10 hidden">
+      <h2 class="text-xl font-semibold mb-4 text-center">Preliminär uppskattning:</h2>
+      <p class="text-gray-700 mb-6 text-center">Du kan ha rätt att förhandla om <span id="totalBelopp" class="font-bold text-blue-700 text-xl"></span> kr.</p>
+      <div class="mb-6">
+        <canvas id="chart"></canvas>
+      </div>
 
-      <div class="mt-8 p-4 border-l-4 border-green-500 bg-green-50">
-        <p class="mb-2 font-medium">Vill du få en färdig rapport med exakta mål, formuleringar och strategi?</p>
-        <p class="mb-4">Få en PDF med det du behöver för att lyckas i din förhandling – skickas direkt till din e-post.</p>
-        <button onclick="mockPay()" class="bg-green-600 text-white px-4 py-2 rounded w-full font-semibold">Få rapporten – 99 kr</button>
+      <div class="p-4 border-l-4 border-green-500 bg-green-50 rounded">
+        <p class="mb-2 font-semibold">Vill du få en färdig rapport med exakta mål och tips?</p>
+        <p class="mb-4 text-sm">Få en PDF anpassad för din förhandling, skickad till din e-post.</p>
+        <button onclick="mockPay()" class="bg-green-600 text-white px-4 py-3 rounded w-full font-semibold text-lg">Få rapporten – 99 kr</button>
       </div>
     </div>
   </div>
