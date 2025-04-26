@@ -6,14 +6,14 @@
   <title>Uppsägningskollen – Få kontroll över din exit</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Uppsägningskollen hjälper dig snabbt och tryggt att beräkna ditt förhandlingsutrymme vid uppsägning eller överenskommelse – baserat på lag, kollektivavtal och praxis.">
-  <link rel="icon" href="https://mrmanager59.github.io/uppsagningskollen/image1.png" type="image/png">
+  <link rel="icon" href="/image1.png" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
 
 <header class="bg-white shadow-md p-4 flex justify-center">
-  <img src="https://mrmanager59.github.io/uppsagningskollen/image1.png" alt="Uppsägningskollen logo" class="h-12 sm:h-16 object-contain" />
+  <img src="/image1.png" alt="Uppsägningskollen logo" class="h-12 sm:h-16 object-contain" />
 </header>
 
 <section class="text-center py-12 px-6 bg-white">
@@ -49,13 +49,14 @@
       <div class="mb-6"><canvas id="chart"></canvas></div>
 
       <div class="mb-6 mt-8">
-        <h4 class="text-lg font-semibold text-center mb-4">Typiskt förhandlingsintervall</h4>
-        <canvas id="goalChart"></canvas>
+        <h4 class="text-lg font-semibold text-center mb-4">Ditt möjliga förhandlingsintervall</h4>
+        <p class="text-center text-gray-600 mb-4">Här ser du ett riktmärke för vad du kan sikta på i din förhandling:</p>
+        <canvas id="goalChart" class="h-64 w-full"></canvas>
       </div>
 
       <div class="p-4 border-l-4 border-green-500 bg-green-50 rounded mt-8">
-        <p class="mb-2 font-semibold">Vill du få en färdig rapport med exakta mål och tips?</p>
-        <p class="mb-4 text-sm">Få en PDF anpassad för din förhandling, skickad till din e-post.</p>
+        <p class="mb-2 font-semibold">Vill du få en färdig rapport med exakta belopp och professionella tips?</p>
+        <p class="mb-4 text-sm">Få en komplett PDF anpassad efter din situation, direkt till din e-post.</p>
         <button onclick="mockPay()" class="bg-green-600 text-white px-4 py-3 rounded w-full font-semibold text-lg">Få rapporten – 99 kr</button>
       </div>
     </div>
@@ -113,23 +114,43 @@ function handleSubmit(event) {
     options: { responsive: true, plugins: { legend: { display: false }, title: { display: true, text: 'Uppskattad kompensation – fördelning' } }, scales: { y: { beginAtZero: true } } }
   });
 
+  // Ta bort och återskapa canvas för goalChart
+  const oldCanvas = document.getElementById("goalChart");
+  const newCanvas = document.createElement("canvas");
+  newCanvas.id = "goalChart";
+  newCanvas.className = "h-64 w-full";
+  oldCanvas.parentNode.replaceChild(newCanvas, oldCanvas);
+
   const ctxGoal = document.getElementById("goalChart").getContext("2d");
-  if (window.goalChart) window.goalChart.destroy();
   window.goalChart = new Chart(ctxGoal, {
     type: 'bar',
     data: {
       labels: ['Lågt mål', 'Rimligt mål', 'Ambitiöst mål'],
       datasets: [{
-        label: 'Förhandlingsmål (proportion)',
-        data: [0.6, 1, 1.3],
-        backgroundColor: ['#60a5fa','#3b82f6','#2563eb']
+        label: 'Förhandlingsmål (kr)',
+        data: [totalBelopp * 0.8, totalBelopp, totalBelopp * 1.3],
+        backgroundColor: ['#60a5fa', '#3b82f6', '#2563eb']
       }]
     },
     options: {
       indexAxis: 'y',
       responsive: true,
-      plugins: { legend: { display: false }, title: { display: true, text: 'Exempel på förhandlingsmål' } },
-      scales: { x: { display: false }, y: { ticks: { color: '#374151' } } }
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: 'Ditt möjliga förhandlingsmål' }
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) { return value.toLocaleString("sv-SE") + " kr"; },
+            stepSize: 100000
+          }
+        },
+        y: {
+          ticks: { color: '#374151' }
+        }
+      }
     }
   });
 }
