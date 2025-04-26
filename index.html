@@ -5,20 +5,28 @@
   <meta charset="UTF-8" />
   <title>Uppsägningskollen – Få kontroll över din exit</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Uppsägningskollen hjälper dig snabbt och tryggt att beräkna ditt förhandlingsutrymme vid uppsägning eller överenskommelse – baserat på lag, kollektivavtal och praxis.">
+  <link rel="icon" href="https://mrmanager59.github.io/uppsagningskollen/image1.png" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-<header class="bg-white shadow p-4 flex items-center justify-center">
-  <img src="https://mrmanager59.github.io/exit-calculator/image1" alt="Uppsägningskollen" class="h-10">
+<header class="bg-white shadow-md p-4 flex justify-center">
+  <img src="https://mrmanager59.github.io/uppsagningskollen/image1.png" alt="Uppsägningskollen logo" class="h-12 sm:h-16 object-contain" />
 </header>
 
 <section class="text-center py-12 px-6 bg-white">
-  <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">Har du blivit uppsagd eller erbjuden en överenskommelse?</h1>
-  <p class="text-gray-600 max-w-2xl mx-auto text-lg">Du kan ha rätt till hundratusentals kronor – vi hjälper dig räkna ut ditt förhandlingsutrymme på 1 minut.</p>
+  <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">Uppsägningskollen</h1>
+  <p class="text-blue-700 font-semibold mb-2">Få kontroll över din exit</p>
+  <p class="text-gray-600 max-w-2xl mx-auto text-lg mb-6">
+    Beräkna snabbt ditt förhandlingsutrymme vid uppsägning eller överenskommelse – baserat på lag, kollektivavtal och etablerad praxis. 
+    Enkelt, tryggt och utan att lämna känsliga uppgifter.
+  </p>
   <div class="mt-8">
-    <button onclick="scrollToCalculator()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded text-lg">Starta gratis kalkyl nu</button>
+    <button onclick="scrollToCalculator()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded text-lg">
+      Starta gratis kalkyl
+    </button>
   </div>
 </section>
 
@@ -63,7 +71,6 @@ function scrollToCalculator() {
   document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' });
 }
 
-
 function handleSubmit(event) {
   event.preventDefault();
   const form = event.target;
@@ -87,87 +94,6 @@ function handleSubmit(event) {
     alert("Något gick fel med beräkningen. Kontrollera att du fyllt i alla fält korrekt.");
     return;
   }
-
-
-  document.getElementById("resultWrapper").classList.remove("hidden");
-  document.getElementById("totalBelopp").textContent = totalBelopp.toLocaleString("sv-SE");
-
-  // Första grafen
-  const ctx = document.getElementById("chart").getContext("2d");
-  if (window.resultChart) window.resultChart.destroy();
-  window.resultChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Uppsägningstid', 'Arbetsbefriad', 'Semester', 'Avgångsvederlag'],
-      datasets: [{
-        label: 'Belopp (kr)',
-        data: [
-          uppsagningstid * lon,
-          arbetsbefriad * lon,
-          semestermånader * lon,
-          avgangsMånader * lon
-        ],
-        backgroundColor: ['#3b82f6','#22c55e','#eab308','#ef4444']
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        title: { display: true, text: 'Uppskattad kompensation – fördelning' }
-      },
-      scales: {
-        y: { beginAtZero: true }
-      }
-    }
-  });
-
-  // Andra grafen (förhandlingsintervall)
-  const ctxGoal = document.getElementById("goalChart").getContext("2d");
-  if (window.goalChart) window.goalChart.destroy();
-  window.goalChart = new Chart(ctxGoal, {
-    type: 'bar',
-    data: {
-      labels: ['Lågt mål', 'Rimligt mål', 'Ambitiöst mål'],
-      datasets: [{
-        label: 'Förhandlingsmål (proportion)',
-        data: [0.6, 1, 1.3],
-        backgroundColor: ['#60a5fa','#3b82f6','#2563eb']
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        title: { display: true, text: 'Exempel på förhandlingsmål' }
-      },
-      scales: {
-        x: { display: false },
-        y: { ticks: { color: '#374151' } }
-      }
-    }
-  });
-}
-
-  event.preventDefault();
-  const form = event.target;
-  const lon = parseFloat(form.lon.value);
-  const uppsagningstid = parseFloat(form.uppsagningstid.value);
-  const arbetsbefriad = parseFloat(form.arbetsbefriad.value) || 0;
-  const semesterdagar = parseFloat(form.semesterdagar.value) || 0;
-  const villAvgangsvederlag = form.villAvgangsvederlag.checked;
-
-  const semestermånader = semesterdagar / 25;
-  const avgangsMånader = villAvgangsvederlag ? 3 : 0;
-  const totalManader = uppsagningstid + arbetsbefriad + semestermånader + avgangsMånader;
-  
-  const totalBelopp = totalManader * lon;
-  if (isNaN(totalBelopp) || !isFinite(totalBelopp)) {
-    alert("Något gick fel med beräkningen. Kontrollera att du fyllt i alla fält korrekt.");
-    return;
-  }
-
 
   document.getElementById("resultWrapper").classList.remove("hidden");
   document.getElementById("totalBelopp").textContent = totalBelopp.toLocaleString("sv-SE");
